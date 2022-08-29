@@ -11,6 +11,7 @@ public class Main {
     static HashMap<String, String> descriptionMonth = new HashMap<>();
     static HashMap<String, String> descriptionYear = new HashMap<>();
     static String[] sepMonths;
+    static String[] sepYear;
 
 
 
@@ -78,14 +79,25 @@ public class Main {
             //System.out.println(Arrays.toString(sepMonths));
             for (int i = 1; i < sepMonths.length; i ++) {
                 String[] lineContents = sepMonths[i].split(", ");
-                System.out.println(Arrays.toString(lineContents));
-//                for (String thing: lineContents) {
-//                    System.out.println(thing);
-//                }
+//                System.out.println(Arrays.toString(lineContents));
+
                 }
-            System.out.println(" ");
+//            System.out.println(" ");
 
             }
+        return null;
+    }
+
+    //Вспомогательный метод разделения полученных данных годового файла
+    private static String[] toSeparateYear() {
+        for (String year: descriptionYear.keySet()) {
+            sepYear = (yearlyReport.toSeparateYear(descriptionYear.get(year)));
+            for (int i = 1; i < sepYear.length; i ++) {
+                String[] lineContents = sepYear[i].split(", ");
+//                System.out.println(Arrays.toString(lineContents));
+            }
+//            System.out.println(" ");
+        }
         return null;
     }
 
