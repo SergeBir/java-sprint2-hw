@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class YearlyReport {
@@ -8,6 +9,9 @@ public class YearlyReport {
     static String totalYear;
     static HashMap<String, String> descriptionYear = new HashMap<>();
     static int countYear = 1;//старт годовых отчетов
+
+    static HashMap <String, Integer> increase = new HashMap<>();
+    static HashMap <String, Integer> decrease = new HashMap<>();
 
     //метод считывания файла года
     public String readYearlyReport(String path, int numb) {
@@ -36,14 +40,22 @@ public class YearlyReport {
     }
 
     //Метод дополнительного разделения полученных данных
-    private static String[] toSeparateYear() {
+    static String[] toSeparateYear() {
         for (String year: descriptionYear.keySet()) {
             sepYear = (toSeparateYear(descriptionYear.get(year)));
             for (int i = 1; i < sepYear.length; i ++) {
-                String[] lineContents = sepYear[i].split(", ");
-//                System.out.println(Arrays.toString(lineContents));
+                String[] lineContents = sepYear[i].split(",");
+                boolean bbb = Boolean.parseBoolean(lineContents[2]);
+                Integer summ = Integer.parseInt(lineContents[1]);
+                String numMonth = lineContents[0];
+                if (!bbb) {
+                    increase.put(numMonth, summ);
+                } else {
+                    decrease.put(numMonth, summ);
+                }
             }
-//            System.out.println(" ");
+//            System.out.println(increase);
+//            System.out.println(decrease);
         }
         return null;
     }

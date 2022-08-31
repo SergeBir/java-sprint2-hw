@@ -20,6 +20,7 @@ public class Main {
             } else if (userChoice == 3) {
 
             } else if (userChoice == 4) {
+                YearlyReport.toSeparateYear();
 
             } else if (userChoice == 5) {
 
