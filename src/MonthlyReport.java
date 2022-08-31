@@ -1,54 +1,92 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
-
 public class MonthlyReport {
-    static String[] lineContents;
-    static String[] sepMonths;
-    static int countMonth = 1;//старт отчета по месяцам
-    static HashMap<String, String> descriptionMonth = new HashMap<>();//для помещения данных по месяцам
+    HashMap<Integer, ArrayList<ForMonthRecord>> monthsRec = new HashMap<>();
 
     //метод считывания файлов месяцев
-    public String readFileContentsOrNull(String path, int numb) {
-        try {
-            System.out.println("Файл m.20210" + numb + ".csv считан");
-            return Files.readString(Path.of(path));
-        } catch (IOException e) {
-            System.out.println("Невозможно прочитать файл с месячным отчётом. Возможно, файл не находится в нужной директории.");
-            return null;
+    public void readMonthReport() {
+        for (int i = 1; i <= 3; i++) {
+            String monthlyReportRew = ForHelp.readFileContentsOrNull("resources/m.20210" + i + ".csv");
+            parseMonthReport(monthlyReportRew, i);
         }
-
+        System.out.println("Месячные отчеты считаны.");
     }
 
-    //метод перебора месяцев и считывания их
-    public String toFollowInMonths() {
-        while (countMonth > 0 && countMonth <= 3) {
-            String monthName = "m.20210" + countMonth;
-            String pathMonth = "/Users/sergeibiryukov/dev/java-sprint2-hw/resources/m.20210" + countMonth + ".csv";
-            String totalMonth = readFileContentsOrNull(pathMonth, countMonth);
-            descriptionMonth.put(monthName, totalMonth);
-            countMonth++;
+    //метод разделения данных
+    private void parseMonthReport(String monthlyReportRew, int key) {
+        String[] lines = monthlyReportRew.split("\n");
+        ArrayList<ForMonthRecord> forMonthRecordArrayList = new ArrayList<>();
+        for (int i = 1; i < lines.length; i++) {
+            String[] lineContents = lines[i].split(",");
+            ForMonthRecord record = new ForMonthRecord(
+                    lineContents[0],
+                    Boolean.parseBoolean(lineContents[1]),
+                    Integer.parseInt(lineContents[2]),
+                    Integer.parseInt(lineContents[3])
+            );
+            forMonthRecordArrayList.add(record);
+            monthsRec.put(key, forMonthRecordArrayList);
         }
-        return null;
     }
 
-    //метод исходного разделения файлов месяцев
-    public static String[] toSeparateMonth(String fileContents) {
-        String[] lines = fileContents.split(System.lineSeparator());
-        return lines;
-    }
-
-    //Метод дополнительного разделения полученных данных по месяцам
-    static String[] toSeparateMonth() {
-        for (String month : descriptionMonth.keySet()) {
-            sepMonths = (toSeparateMonth(descriptionMonth.get(month)));
-            for (int i = 1; i < sepMonths.length; i++) {
-                lineContents = sepMonths[i].split(", ");
-                //System.out.println(Arrays.toString(lineContents));
+    //метод находения самого прибыльного и убыточного товаров
+    public void minAndMaReport(){
+        if (monthsRec.isEmpty()) {
+            System.out.println("Отчетов нет");
+        } else {
+            for (Integer month : monthsRec.keySet()) {
+                int maxMonth = 0;
+                int minMonth = 0;
+                String maxMonthName = " ";
+                String minMonthName = " ";
+                for (ForMonthRecord reportCompare : monthsRec.get(month)) {
+                    if (!reportCompare.is_expenses) {
+                        int sum = reportCompare.sum_of_one * reportCompare.quantity;
+                        if (sum > maxMonth){
+                            maxMonth = sum;
+                            maxMonthName = reportCompare.item_names;
+                        }
+                    } else {
+                        int exp = reportCompare.sum_of_one * reportCompare.quantity;
+                        if (exp > minMonth){
+                            minMonth = exp;
+                            minMonthName = reportCompare.item_names;
+                        }
+                    }
+                }
+                System.out.println("Отчет за месяц: " + NameOfMonths.toGetNameOfMonth(month) + "\n" + "Наиболее продаваемый товар: " + maxMonthName + " : " + maxMonth + "\n"
+                        + "Наиболее убыточный товар: " + minMonthName + " : " + minMonth);
             }
-//            System.out.println(" ");
         }
-        return null;
+    }
+
+    //получение месяных трат
+    public int toGetOfMonthExpense(int month) {
+        int allExpenses = 0;
+        for (ForMonthRecord report : monthsRec.get(month)) {
+            if (report.is_expenses) {
+                allExpenses += report.quantity * report.sum_of_one;
+            }
+        }
+        return allExpenses;
+    }
+
+    //получение месячного дохода
+    public int toGetMonthIncome(int month) {
+        int allIncomes = 0;
+        for (ForMonthRecord report: monthsRec.get(month)) {
+            if (!report.is_expenses) {
+                allIncomes += report.quantity * report.sum_of_one;
+            }
+        }
+        return allIncomes;
+    }
+
+    public boolean isNotFull() {
+        if(monthsRec.size() != 0){
+            return false;
+        } else {
+            return true;
+        }
     }
 }

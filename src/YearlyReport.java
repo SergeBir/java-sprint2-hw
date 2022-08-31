@@ -1,63 +1,93 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class YearlyReport {
-    static String[] sepYear;
-    static String totalYear;
-    static HashMap<String, String> descriptionYear = new HashMap<>();
-    static int countYear = 1;//старт годовых отчетов
+    ArrayList<ForYearRec> forYearRecs; // куда будут добавляться данные при разделении файла
 
-    static HashMap <String, Integer> increase = new HashMap<>();
-    static HashMap <String, Integer> decrease = new HashMap<>();
+    YearlyReport() {
+        forYearRecs = new ArrayList<>();
+    }
 
-    //метод считывания файла года
-    public String readYearlyReport(String path, int numb) {
-        try {
-            System.out.println("Файл y.202" + numb + ".csv считан");
-            return Files.readString(Path.of(path));
-        } catch (IOException e) {
-            System.out.println("Невозможно прочитать файл с месячным отчётом. Возможно, файл не находится в нужной директории.");
-            return null;
+    //метод считывания годового файла
+    public void readReportOfYear() {
+        String yearReportRew = ForHelp.readFileContentsOrNull("resources/y.2021.csv");
+        separateReportYear(yearReportRew);
+        System.out.println("Годовой отчет считан");
+    }
+
+    //метод разделения данных в файле
+    private void separateReportYear(String yearlyReportRew) {
+        String[] lines = yearlyReportRew.split("\n");
+        for (int i = 1; i < lines.length; i++) {
+            String[] lineContents = lines[i].split(",");
+            ForYearRec record = new ForYearRec(Integer.parseInt(lineContents[0]), Integer.parseInt(lineContents[1]), Boolean.parseBoolean(lineContents[2]));
+            forYearRecs.add(record);
         }
     }
 
-    //метод перебора годовых отчетов и считывания их
-    public String toFollowInYears () {
-        String yearName = "y.202" + countYear;
-        String pathYear = "/Users/sergeibiryukov/dev/java-sprint2-hw/resources/y.202" + countYear + ".csv";
-        totalYear = readYearlyReport(pathYear, countYear);
-        descriptionYear.put(yearName,totalYear);
+    //траты
+    Integer toTakeYearMonthExpense(int month) {
+        for (ForYearRec forYearRec : forYearRecs) {
+            if ((forYearRec.months == month) && (forYearRec.is_exp)) {
+                return forYearRec.amounts;
+            }
+        }
         return null;
     }
 
-    //метод разделения файлов года
-    public static String[] toSeparateYear(String fileContents) {
-        String[] lines = fileContents.split(System.lineSeparator());
-        return lines;
+    //доход
+    Integer getIncome(int month) {
+        for (ForYearRec forYearRec : forYearRecs) {
+            if ((forYearRec.months == month) && (!forYearRec.is_exp)) {
+                return forYearRec.amounts;
+            }
+        }
+        return null;
     }
 
-    //Метод дополнительного разделения полученных данных
-    static String[] toSeparateYear() {
-        for (String year: descriptionYear.keySet()) {
-            sepYear = (toSeparateYear(descriptionYear.get(year)));
-            for (int i = 1; i < sepYear.length; i ++) {
-                String[] lineContents = sepYear[i].split(",");
-                boolean bbb = Boolean.parseBoolean(lineContents[2]);
-                Integer summ = Integer.parseInt(lineContents[1]);
-                String numMonth = lineContents[0];
-                if (!bbb) {
-                    increase.put(numMonth, summ);
+    public void toAverYearRep() {
+        if (forYearRecs.isEmpty()) {
+            System.out.println("Данных нет!");
+        } else {
+            int averagInc = 0;
+            int averageExp = 0;
+            for (ForYearRec reportCompare : forYearRecs) {
+                if (!reportCompare.is_exp) {
+                    averagInc += reportCompare.amounts / 3;
                 } else {
-                    decrease.put(numMonth, summ);
+                    averageExp += reportCompare.amounts / 3;
                 }
             }
-//            System.out.println(increase);
-//            System.out.println(decrease);
+            System.out.println("Средний доход составляет: " + averagInc + "\n" + "Средний расход составляет: " + averageExp);
         }
-        return null;
     }
 
+    //метод получения месячного дохода
+    public void MonthProfit() {
+        if (forYearRecs.isEmpty()) {
+            System.out.println("Отчетов еще нет!");
+        } else {
+            int moneyProfit = 0;
+            int incrProfit = 0;
+            int exprProfit = 0;
+            for (ForYearRec reportCompare : forYearRecs) {
+                if (!reportCompare.is_exp) {
+                    incrProfit = reportCompare.amounts;
+                } else {
+                    exprProfit = reportCompare.amounts;
+                }
+            }
+            moneyProfit = incrProfit - exprProfit;
+            System.out.println("Доход составил: " + moneyProfit);
+        }
     }
+
+    //проверка заполненности
+    public boolean isNotFull() {
+        if (forYearRecs.size() != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
