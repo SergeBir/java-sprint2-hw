@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 public class MonthlyReport {
     HashMap<Integer, ArrayList<ForMonthRecord>> monthsRec = new HashMap<>();
 
@@ -7,6 +9,7 @@ public class MonthlyReport {
     public void readMonthReport() {
         for (int i = 1; i <= 3; i++) {
             String monthlyReportRew = ForHelp.readFileContentsOrNull("resources/m.20210" + i + ".csv");
+            assert monthlyReportRew != null;
             parseMonthReport(monthlyReportRew, i);
         }
         System.out.println("Месячные отчеты считаны.");
@@ -18,28 +21,32 @@ public class MonthlyReport {
         ArrayList<ForMonthRecord> forMonthRecordArrayList = new ArrayList<>();
         for (int i = 1; i < lines.length; i++) {
             String[] lineContents = lines[i].split(",");
-            ForMonthRecord record = new ForMonthRecord(
-                    lineContents[0],
-                    Boolean.parseBoolean(lineContents[1]),
-                    Integer.parseInt(lineContents[2]),
-                    Integer.parseInt(lineContents[3])
-            );
-            forMonthRecordArrayList.add(record);
-            monthsRec.put(key, forMonthRecordArrayList);
+            if (lineContents.length == 4) {
+                ForMonthRecord record = new ForMonthRecord(
+                        lineContents[0],
+                        Boolean.parseBoolean(lineContents[1]),
+                        Integer.parseInt(lineContents[2]),
+                        Integer.parseInt(lineContents[3])
+                );
+                forMonthRecordArrayList.add(record);
+                monthsRec.put(key, forMonthRecordArrayList);
+            } else {
+                System.out.println("Ошибка данных!");
+            }
         }
-    }
+        }
 
     //метод находения самого прибыльного и убыточного товаров
     public void minAndMaReport(){
         if (monthsRec.isEmpty()) {
             System.out.println("Отчетов нет");
         } else {
-            for (Integer month : monthsRec.keySet()) {
+            for (Map.Entry<Integer, ArrayList<ForMonthRecord>> month : monthsRec.entrySet()) {
                 int maxMonth = 0;
                 int minMonth = 0;
                 String maxMonthName = " ";
                 String minMonthName = " ";
-                for (ForMonthRecord reportCompare : monthsRec.get(month)) {
+                for (ForMonthRecord reportCompare : month.getValue()) {
                     if (!reportCompare.is_expenses) {
                         int sum = reportCompare.sum_of_one * reportCompare.quantity;
                         if (sum > maxMonth){
@@ -54,7 +61,7 @@ public class MonthlyReport {
                         }
                     }
                 }
-                System.out.println("Отчет за месяц: " + NameOfMonths.toGetNameOfMonth(month) + "\n" + "Наиболее продаваемый товар: " + maxMonthName + " : " + maxMonth + "\n"
+                System.out.println("Отчет за месяц: " + NameOfMonths.toGetNameOfMonth(month.getKey()) + "\n" + "Наиболее продаваемый товар: " + maxMonthName + " : " + maxMonth + "\n"
                         + "Наиболее убыточный товар: " + minMonthName + " : " + minMonth);
             }
         }

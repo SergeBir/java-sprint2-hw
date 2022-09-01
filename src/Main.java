@@ -16,7 +16,6 @@ public class Main {
 
         while (true) {
             printMenu();
-            //String command1 =
             int command = scanner.nextInt();
             if (command == 1) {
                 monthlyReport.readMonthReport();
