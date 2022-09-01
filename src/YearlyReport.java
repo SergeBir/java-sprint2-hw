@@ -62,7 +62,7 @@ public class YearlyReport {
     }
 
     //метод получения месячного дохода
-    public void MonthProfit() {
+    public void monthReport() {
         if (forYearRecs.isEmpty()) {
             System.out.println("Отчетов еще нет!");
         } else {

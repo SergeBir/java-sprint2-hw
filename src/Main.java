@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        ForHelp forHelp = new ForHelp();
+        //ForHelp forHelp = new ForHelp();
 
         YearlyReport yearlyReport = new YearlyReport();
 
@@ -22,11 +22,11 @@ public class Main {
             } else if (command == 2) {
                 yearlyReport.readReportOfYear();
             } else if (command == 3) {
-                forHelp.orderReport(monthlyReport, yearlyReport);
+                ForHelp.orderReport(monthlyReport, yearlyReport);
             } else if (command == 4) {
                 monthlyReport.minAndMaReport();
             } else if (command == 5) {
-                yearlyReport.MonthProfit();
+                yearlyReport.monthReport();
                 yearlyReport.toAverYearRep();
 
             } else if (command == 0) {
