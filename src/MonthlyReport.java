@@ -9,10 +9,11 @@ public class MonthlyReport {
     public void readMonthReport() {
         for (int i = 1; i <= 3; i++) {
             String monthlyReportRew = ForHelp.readFileContentsOrNull("resources/m.20210" + i + ".csv");
-            assert monthlyReportRew != null;
-            parseMonthReport(monthlyReportRew, i);
-        }
-        System.out.println("Месячные отчеты считаны.");
+            if( monthlyReportRew != null) {
+                parseMonthReport(monthlyReportRew, i);
+                System.out.println("Файл m.20210" + i + " считан");
+            }
+            }
     }
 
     //метод разделения данных

@@ -10,8 +10,10 @@ public class YearlyReport {
     //метод считывания годового файла
     public void readReportOfYear() {
         String yearReportRew = ForHelp.readFileContentsOrNull("resources/y.2021.csv");
-        separateReportYear(yearReportRew);
-        System.out.println("Годовой отчет считан");
+        if (yearReportRew != null) {
+            separateReportYear(yearReportRew);
+            System.out.println("Годовой отчет считан");
+        }
     }
 
     //метод разделения данных в файле
